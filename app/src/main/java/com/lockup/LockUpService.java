@@ -1,7 +1,5 @@
 package com.lockup;
 
-import android.app.Notification;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -12,13 +10,11 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.hardware.usb.UsbManager;
-import android.os.FileObserver;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Process;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import java.io.ByteArrayInputStream;
@@ -29,7 +25,6 @@ import java.security.MessageDigest;
 import java.security.Principal;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -173,14 +168,6 @@ public class LockUpService extends Service {
             "rootspotter.apk"
     };
 
-    // Need root to check for these but lets leave these here for now
-    String[] bannedClients = new String[]{
-            "QAAAANXZ0PeDaBpYMM/Wi4GQo/hZ9WooUYwFbp55Ce/9oWbse0sG3R9LaAv+78MZF0KuWty8hpHgBVDsbnVskWo6gsl6hnYsPLe+waEoIMhnELeFzW1P7vCEoqNvOtxcCb8HoJgqjlDK7QHO8AOTd/snH/LQHaWig6EnaqvJd1ATL8MaELx2vpK1FhkRHrH7kwJpBpRZvJia6iAv7jKlOiDWoKB3JFKv3CbQCVCQYXw1KC/vLYCSuv02rmePcZwXl7eKGbVgzytaE0CHxZM0zuN7cJ3sQ/P5mSD1Z35uraxd4y6gMXFM0swcIiWMOpYQ7WiJvlN8XnLoN9TluLkuTRTyM59Fbt/kDXPHDWWzWU/M6H8I9LtFsIBCBc4mxE5xSF/qI9NVxK13UVIda/b4S45pp2rhf7wOoXRDCpXczRw+a4zwzGVP0Dvh0IrDhwP6IFRHWC9OmQ/oaNdvq3nJgyxHPI3iFoVpa1BPpfPa29WmiCJf86FhS/OjdnqdcrfKhcffpOH8kqUmsPIRVzCYvG4zK5sM+tZiHxUgkc1NrFNvw5x8UKsuJaJY+GNWix7J7SHn5Y6EeFtCCI0MWpcVoTXzLrXET1/Kzl3pMAxLm17YIScN0PnwSAtBlb1eVGLtQ+UqKZ3U2on2CJoRNK2j6QJq53O5K1K8ByI0I9OHng7pYDbVK2FPyAEAAQA= unknown@unknown",
-            "QAAAAAE5nlT/OO1UtGpoZFGmwA0jP+1pO7QNDzaRlEIyObUz7ziSZnWhvpKYyxAGDNKMNcFx20KX4EzjtHH6Rd6uvtmaZTd2q2pAYKxex/e+B9bFtpnmWye/ybZoqp0XWiQyFoIQE0e57w8D0732seBzJmi3pu72M3naLRoko/b0HacPMz5xnaz7UCw3Qq4BnOcxrGvVdL9M1UcJYhiZZW6a4CbvqnY1dUFoE3xaWxya3F2yL63EtUZbkt0c4rF1nvjHIaZ706NQYC7vsHWQiFll3Ct87X78wQQW7xqFiRDk/hzIoIdHdaxxqeFerehtk0IZnJQSiOEXnTHQIHv9nSi6JDbNNKizAgelP+r4rdoXcoKEFh0C2AzrrpcvgtoPedG9c2iDiCVohn9/TA7x1vkrwnrTgjG0G3T6gO7YRKOmWtjrTmMj7khpjTZvj+6jYJS2pr4JRq/UqymLctGFm0TxvjpRJsrJeFb//Ur8UXQY2BGf9qxYNj8qSDZdJEFGHVOGAGttQXZOCSOmw1ai8XTyN+DcMZ6F1iaSdTb72apYtdWsTTGKlpj0FO89twyLAzerCdpNt3swiGIBd1khTq7lHdOxmWOUd36GqnipAsQtxsALmjboTdaBHnmViJsRxpnkdbSnxCZpBvXhZIDnGi5Glekv9NkSZ/L5DE4Z0oogkNGvGQPRlQEAAQA= unknown@unknown",
-            "QAAAAEdvwzGJdQJiFMyhWbG/B83GfOJpouYZbWoHvpklhxa0vZGiqSBO2NFglV7YQiae8uPfK20873D8iKnHuaWUxNvO3Ic7QsnXTciBTHvz6DO2wbBklhp9UNE6voLDsaOCE9g3kbh5iaU0ddrH+aMc6s/E/+CKxGes41xAqzOHYI6aGX4ebY6GaTjpungR9mgLiJeCniqh3WvO+59KQ10LJWrEmj4r0984gWDQ9IoS+d+/lMTFdKAYt4NIjybt9O3Eqde6/ZtOOiSWdUed5XV5tHXhvEG31ATu6G2j5lctPZt2RigON3NaxI0xnzBV+b4dRljaT6lJPhnNmWT55tm0wt5vwNq6JHUtvubqMT+VrArtaT46bst5y6DQuE88wA85wOCZfKVfX0f7SWNE2U6FSq8XhERCXPMsV/oYAewkRn1lwBY0nMoMYDDjM0wHwxFXq+UIvo35qxeZAMdkzbWoBtTHiXaA+nOIuQw+FCkugkpk/hzHQrF/QRF0KhkINIQSfFicawysmfCJV4n9KeMaDOPd/wuNm7JnhvmcHm9I0ArTPtgiuS1DBjzRnK/zTBAyLSYRCPVIBaG82GdGcrao+sxXRd6mCiNNcbW1RTEeGKlL25h+NCz2flHSbxIfT1pyYjOLPjZcfi1hYAN/pjLFbXkMtV+oMHDQZ4PUe9Obxz6K57i+FwEAAQA= unknown@unknown",
-            "" // bring the fourth key in
-    };
-
     String[] bannedKeys = new String[]{
             "df89c654afaad67ac7e85e5d34072b5463ea0849ef3e8462a13e299baa6aa6dc",
             "a4ea82cd91d99bf26ca19dfd4b1969c42b5551151f1d3bdb635ebb2567e5a741",
@@ -280,9 +267,7 @@ public class LockUpService extends Service {
                                 }
                             }
                         }
-                        if (count < 0 && count > 2) {
-                            // improve
-                        } else if (count >= 2) {
+                        if (count > 0) {
                             defense.protect_device_run();
                         }
                     }
@@ -362,7 +347,6 @@ public class LockUpService extends Service {
         usbFilter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
         usbFilter.addAction(UsbManager.ACTION_USB_ACCESSORY_DETACHED);
         usbFilter.addAction(UsbManager.ACTION_USB_ACCESSORY_ATTACHED);
-        usbFilter.addAction(UsbManager.ACTION_USB_ACCESSORY_DETACHED);
         usbFilter.addAction("android.hardware.usb.action.USB_STATE");
         registerReceiver(mUsbAttachReceiver, usbFilter);
 

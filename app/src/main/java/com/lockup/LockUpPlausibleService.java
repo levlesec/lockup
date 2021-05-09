@@ -2,8 +2,6 @@ package com.lockup;
 
 import android.accessibilityservice.AccessibilityService;
 import android.app.KeyguardManager;
-import android.app.Notification;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,11 +12,10 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 
-   /*
+    /*
         This is a proof of concept and a thought experiment. Do not run this on your personal
         device. This _will_ expose not just your plausible deniability password to LockUp but also
         _your_real_password_. Do you want your _real_password_ exposed to LockUp? Probably not.
@@ -32,7 +29,6 @@ public class LockUpPlausibleService extends AccessibilityService {
     public int onStartCommand(Intent intent, int flags, int startId) {
         return START_STICKY;
     }
-
 
     @Override
     public void onInterrupt() {
@@ -62,18 +58,17 @@ public class LockUpPlausibleService extends AccessibilityService {
     }
 
     Integer pointsHave = 0;
-
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         if (preferences.getBoolean("accessibility", false) && preferences.getBoolean("plausible", false)) {
             String deniabilityPw = preferences.getString("deniabilityPw", "LockUp");
-
             Integer pointsNeeded = deniabilityPw.length() - 1;
-
             PowerManager powerManager = (PowerManager) this.getSystemService(Context.POWER_SERVICE);
             boolean isAwake = (Build.VERSION.SDK_INT < 20 ? powerManager.isScreenOn() : powerManager.isInteractive());
             if (isAwake) {
+                // inKeyguardRestrictedInputMode is deprecated now. xref: https://developer.android.com/reference/android/app/KeyguardManager#inKeyguardRestrictedInputMode()
+                // Maybe a good replacement isDeviceLocked. xref: https://developer.android.com/reference/android/app/KeyguardManager#isDeviceLocked()
                 KeyguardManager keyMgr = (KeyguardManager) this.getSystemService(Context.KEYGUARD_SERVICE);
                 if (keyMgr.inKeyguardRestrictedInputMode()) {
                     switch (event.getEventType()) {
@@ -100,7 +95,6 @@ public class LockUpPlausibleService extends AccessibilityService {
             }
         }
     }
-
 
     LockUpPlausibleServiceHandler LockUpPlausibleServiceHandler;
     @Override

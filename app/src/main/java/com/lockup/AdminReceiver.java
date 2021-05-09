@@ -23,7 +23,6 @@ public class AdminReceiver extends DeviceAdminReceiver {
     @Override
     public CharSequence onDisableRequested(Context context, Intent intent) {
         DevicePolicyManager deviceManger = (DevicePolicyManager)context.getSystemService(Context.DEVICE_POLICY_SERVICE);
-        // Require unlock before uninstall
         deviceManger.lockNow();
         return "Thank you for choosing LockUp. Please come back again!";
     }

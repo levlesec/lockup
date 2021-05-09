@@ -10,8 +10,7 @@ import android.util.Log;
 // https://stackoverflow.com/questions/7690350/android-start-service-on-boot
 public class BootNoticeReceiver extends BroadcastReceiver {
 
-    // https://stackoverflow.com/questions/17588910/check-if-service-is-running-on-android?lq=1
-    // getRunningServices is deprecated. need a replacement
+    // getRunningServices deprecated. xref: https://developer.android.com/reference/android/app/ActivityManager#getRunningServices(int)
     private boolean isServiceRunning(Class serviceClass,Context context) {
         ActivityManager manager = (ActivityManager)context. getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {

@@ -1,24 +1,17 @@
 package com.lockup;
 
 import android.app.ActivityManager;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.preference.PreferenceManager;
-import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.ToggleButton;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -73,8 +66,7 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
     }
     private boolean isServiceRunning(Class serviceClass) {
-        // Find a replacement for the deprecated getRunningServices function? Might be able to use
-        // for our own services regardless of deprecation.
+        // getRunningServices deprecated. xref: https://developer.android.com/reference/android/app/ActivityManager#getRunningServices(int)
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
             if (serviceClass.getName().equals(service.service.getClassName())) {
