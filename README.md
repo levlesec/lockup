@@ -42,6 +42,6 @@ I've released security advisories for the Cellebrite UFED which you may also be 
 
 ## License
 
-[Creative Commons V1](https://github.com/mbkore/lockup/blob/main/LICENS)
+[Creative Commons Zero 1.0](https://github.com/mbkore/lockup/blob/main/LICENSE)
 
 
